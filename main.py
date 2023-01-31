@@ -1,9 +1,6 @@
 import pygame
 from pygame.locals import *
-import time
 import requests
-import platform
-import subprocess
 import datetime
 import tracer
 from RPi.GPIO import GPIO
@@ -156,7 +153,7 @@ if True:
                 log3 = log2
                 log2 = log1
 
-                if clockedIn == False:
+                if not clockedIn:
                     clockInNext = True
                 else:
                     clockOutNext = True
@@ -199,12 +196,12 @@ if True:
             textLine5 = font35.render(log5, 1, (255, 255, 255))
             textLine6 = font35.render(log6, 1, (255, 255, 255))
 
-            screen.blit(textLine1, (pos1))
-            screen.blit(textLine2, (pos2))
-            screen.blit(textLine3, (pos3))
-            screen.blit(textLine4, (pos4))
-            screen.blit(textLine5, (pos5))
-            screen.blit(textLine6, (pos6))
+            screen.blit(textLine1, pos1)
+            screen.blit(textLine2, pos2)
+            screen.blit(textLine3, pos3)
+            screen.blit(textLine4, pos4)
+            screen.blit(textLine5, pos5)
+            screen.blit(textLine6, pos6)
 
             totalValueLine = font35.render(f"{totalValueStr}hours <min>min", 1, (255, 255, 255))
             screen.blit(totalLine, (280, 90))
@@ -215,24 +212,16 @@ if True:
 
             screen.blit(settingsIcon, (430, 2))
 
-            screen.blit(settingsTitle, (setpos1))
-            screen.blit(setting1, (setpos2))
-            screen.blit(setting2, (setpos3))
-            screen.blit(setting3, (setpos4))
-            screen.blit(setting4, (setpos5))
-            screen.blit(setting5, (setpos6))
-            screen.blit(setting6, (setpos7))
-            screen.blit(settingsFooter, (setpos8))
+            screen.blit(settingsTitle, setpos1)
+            screen.blit(setting1, setpos2)
+            screen.blit(setting2, setpos3)
+            screen.blit(setting3, setpos4)
+            screen.blit(setting4, setpos5)
+            screen.blit(setting5, setpos6)
+            screen.blit(setting6, setpos7)
+            screen.blit(settingsFooter, setpos8)
 
         pygame.display.flip()
         clock.tick(30)
 
     pygame.quit()
-
-
-
-#    img=pygame.image.load(filename)
-#    screen.blit(img,(0,0))
-
-#line1 = pygame.Rect(0, 64, 240, 6)
-#pygame.draw.rect(screen, "WHITE", line1)
