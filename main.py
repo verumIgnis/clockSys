@@ -2,16 +2,22 @@ import pygame
 from pygame.locals import *
 import requests
 import datetime
-import tracer
-from RPi.GPIO import GPIO
+debug = False
+try:
+    from RPi.GPIO import GPIO
+except:
+    debug = True
+    print("Running in debug mode")
 
-GPIO.setmode(GPIO.BOARD)
+if not debug:
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(36, GPIO.OUT, initial=GPIO.HIGH)
+    GPIO.setup(38, GPIO.OUT, initial=GPIO.HIGH)
+    GPIO.setup(40, GPIO.OUT, initial=GPIO.HIGH)
+    GPIO.setup(32, GPIO.IN)
 
-# set pins 36, 38, 40 to output and high
-GPIO.setup(36, GPIO.OUT, initial=GPIO.HIGH)
-GPIO.setup(38, GPIO.OUT, initial=GPIO.HIGH)
-GPIO.setup(40, GPIO.OUT, initial=GPIO.HIGH)
-GPIO.setup(32, GPIO.IN)
+with open("key.txt", "r") as f:
+    key = f.read()
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -70,8 +76,6 @@ upload = False
 KAnext = False
 clockInNext = False
 clockOutNext = False
-clockedIn = True
-total = 0
 timeOffset = 0
 
 backdrop=pygame.image.load("backdrop.png")
@@ -93,20 +97,21 @@ settingsFooter = font16.render("Made by verumIgnis for a GCSE project. github.co
 
 settingsBtn = pygame.Rect(430, 8, 48, 48)
 
-# Get the current total and clocked in status from the server
-response = requests.get(f"{url}clocklogs.json")
-data = response.json()
-print(data)
-latestLog = data[-1]
-total = latestLog["total"]
-clockedIn = latestLog["clockedin"]
-
-"""
-except requests.exceptions.RequestException as e:
-    print('Failed to connect to server:', e)
-    total = None
-    clockedIn = None
-"""
+try:
+    response = requests.get(f"{url}clocklogs.json")
+    data = response.json()
+    latestLog = data[-1]
+    total = latestLog["total"]
+    clockedIn = latestLog["clockedin"]
+except:
+    print("Failed to get logs, using defaults")
+    newLog = {
+        "clockedin": 0,
+        "total": 0,
+        "time": "0:0",
+        "minute": 0,
+        "hour": 0
+    }
 
 if True:
     level = 0
@@ -117,7 +122,7 @@ if True:
             currentTime = datetime.datetime.now()
             log1 = f"Clock in @{currentTime.hour}:{currentTime.minute}"
             sendJson = {"minute": currentTime.minute, "hour": currentTime.hour}
-            x = requests.post(url=f"{url}clockin", json=sendJson)
+            x = requests.post(url=f"{url}clockin{key}", json=sendJson)
             clockInNext = False
             upload = False
 
@@ -125,7 +130,7 @@ if True:
             currentTime = datetime.datetime.now()
             log1 = f"Clock out @{currentTime.hour}:{currentTime.minute}"
             sendJson = {"minute": currentTime.minute, "hour": currentTime.hour}
-            x = requests.post(url=f"{url}clockout", json=sendJson)
+            x = requests.post(url=f"{url}clockout{key}", json=sendJson)
             total = x
             clockOutNext = False
             upload = False
@@ -138,25 +143,41 @@ if True:
                 if settingsBtn.collidepoint(event.pos):
                     if level == 2:
                         level = 1
-                        tracer.trace(143, "level", level)
                     elif level == 1:
                         level = 2
-                        tracer.trace(146, "level", level)
-        if GPIO.input(32):
-            if level == 1:
-                clockedIn = not clockedIn
-                upload = True
+            elif event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    if level == 1:
+                        clockedIn = not clockedIn
+                        upload = True
 
-                log6 = log5
-                log5 = log4
-                log4 = log3
-                log3 = log2
-                log2 = log1
+                        log6 = log5
+                        log5 = log4
+                        log4 = log3
+                        log3 = log2
+                        log2 = log1
 
-                if not clockedIn:
-                    clockInNext = True
-                else:
-                    clockOutNext = True
+                        if not clockedIn:
+                            clockInNext = True
+                        else:
+                            clockOutNext = True
+
+        if not debug:
+            if GPIO.input(32):
+                if level == 1:
+                    clockedIn = not clockedIn
+                    upload = True
+
+                    log6 = log5
+                    log5 = log4
+                    log4 = log3
+                    log3 = log2
+                    log2 = log1
+
+                    if not clockedIn:
+                        clockInNext = True
+                    else:
+                        clockOutNext = True
 
         if KAnext:
             KAnext = False
