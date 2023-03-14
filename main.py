@@ -2,6 +2,8 @@ import pygame
 from pygame.locals import *
 import requests
 import datetime
+import os
+
 debug = False
 try:
     from RPi.GPIO import GPIO
@@ -112,6 +114,8 @@ except:
         "minute": 0,
         "hour": 0
     }
+    clockedIn = False
+    total = 0
 
 if True:
     level = 0
@@ -138,7 +142,6 @@ if True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 abort = True
-
             elif event.type == MOUSEBUTTONDOWN:
                 if settingsBtn.collidepoint(event.pos):
                     if level == 2:
@@ -146,7 +149,9 @@ if True:
                     elif level == 1:
                         level = 2
             elif event.type == KEYDOWN:
-                if event.key == K_SPACE:
+                if event.key == K_f:
+                    os._exit(0)
+                if event.key == K_SPACE and debug == True:
                     if level == 1:
                         clockedIn = not clockedIn
                         upload = True
@@ -224,9 +229,9 @@ if True:
             screen.blit(textLine5, pos5)
             screen.blit(textLine6, pos6)
 
-            totalValueLine = font35.render(f"{totalValueStr}hours <min>min", 1, (255, 255, 255))
+            totalValueLine = font35.render(f"{totalValueStr} hours", 1, (255, 255, 255))
             screen.blit(totalLine, (280, 90))
-            screen.blit(totalValueLine, (280, 145))
+            screen.blit(totalValueLine, (260, 145))
             
         elif level == 2:
             screen.blit(settingsBackdrop, (0, 0))
