@@ -3,6 +3,9 @@ from pygame.locals import *
 import requests
 import datetime
 import os
+import time
+
+waitTime = time.time()
 
 debug = False
 try:
@@ -168,21 +171,21 @@ if True:
                             clockOutNext = True
 
         if not debug:
-            if GPIO.input(32):
-                if level == 1:
-                    clockedIn = not clockedIn
-                    upload = True
+            if GPIO.input(32) and time.time() - waitTime >= 1 and level == 1:
+                waitTime = time.time()
+                clockedIn = not clockedIn
+                upload = True
 
-                    log6 = log5
-                    log5 = log4
-                    log4 = log3
-                    log3 = log2
-                    log2 = log1
+                log6 = log5
+                log5 = log4
+                log4 = log3
+                log3 = log2
+                log2 = log1
 
-                    if not clockedIn:
-                        clockInNext = True
-                    else:
-                        clockOutNext = True
+                if not clockedIn:
+                    clockInNext = True
+                else:
+                    clockOutNext = True
 
         if KAnext:
             KAnext = False
@@ -231,7 +234,7 @@ if True:
 
             totalValueLine = font35.render(f"{totalValueStr} hours", 1, (255, 255, 255))
             screen.blit(totalLine, (280, 90))
-            screen.blit(totalValueLine, (260, 145))
+            screen.blit(totalValueLine, (280, 145))
             
         elif level == 2:
             screen.blit(settingsBackdrop, (0, 0))
