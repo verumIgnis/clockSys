@@ -68,7 +68,7 @@ log5 = "-"
 log6 = "-"
 
 size = (480, 320)
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 pygame.display.set_caption("clockSys")
 clock = pygame.time.Clock()
 
