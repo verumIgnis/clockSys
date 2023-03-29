@@ -9,7 +9,7 @@ waitTime = time.time()
 
 debug = False
 try:
-    from RPi.GPIO import GPIO
+    import RPi.GPIO as GPIO
 except:
     debug = True
     print("Running in debug mode")
@@ -57,6 +57,13 @@ setpos6 = (10, 222)
 setpos7 = (10, 262)
 setpos8 = (10, 300)
 
+setposOffset2 = (190, 62)
+setposOffset3 = (190, 102)
+setposOffset4 = (190, 142)
+setposOffset5 = (190, 182)
+setposOffset6 = (190, 222)
+setposOffset7 = (190, 262)
+
 totalValueFloat = 0.0
 totalValueStr = "0"
 
@@ -68,7 +75,10 @@ log5 = "-"
 log6 = "-"
 
 size = (480, 320)
-screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+if debug:
+    screen = pygame.display.set_mode(size)
+else:
+    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 pygame.display.set_caption("clockSys")
 clock = pygame.time.Clock()
 
@@ -99,6 +109,13 @@ setting4 = font35.render("setting4", 1, (255, 255, 255))
 setting5 = font35.render("setting5", 1, (255, 255, 255))
 setting6 = font35.render("setting6", 1, (255, 255, 255))
 settingsFooter = font16.render("Made by verumIgnis for a GCSE project. github.com/verumIgnis", 1, (255, 255, 255))
+
+set1 = font35.render("-", 1, (255, 255, 255))
+set2 = font35.render("0:0", 1, (255, 255, 255))
+set3 = font35.render("https://verumignis.com/", 1, (255, 255, 255))
+set4 = font35.render("(unused)", 1, (255, 255, 255))
+set5 = font35.render("(unused)", 1, (255, 255, 255))
+set6 = font35.render("(unused)", 1, (255, 255, 255))
 
 settingsBtn = pygame.Rect(430, 8, 48, 48)
 
@@ -154,7 +171,7 @@ if True:
             elif event.type == KEYDOWN:
                 if event.key == K_f:
                     os._exit(0)
-                if event.key == K_SPACE and debug == True:
+                if event.key == K_SPACE and debug:
                     if level == 1:
                         clockedIn = not clockedIn
                         upload = True
@@ -171,7 +188,7 @@ if True:
                             clockOutNext = True
 
         if not debug:
-            if GPIO.input(32) and time.time() - waitTime >= 1 and level == 1:
+            if not GPIO.input(32) and time.time() - waitTime >= 5 and level == 1:
                 waitTime = time.time()
                 clockedIn = not clockedIn
                 upload = True
@@ -249,6 +266,13 @@ if True:
             screen.blit(setting5, setpos6)
             screen.blit(setting6, setpos7)
             screen.blit(settingsFooter, setpos8)
+
+            screen.blit(set1, setposOffset2)
+            screen.blit(set2, setposOffset3)
+            screen.blit(set3, setposOffset4)
+            screen.blit(set4, setposOffset5)
+            screen.blit(set5, setposOffset6)
+            screen.blit(set6, setposOffset7)
 
         pygame.display.flip()
         clock.tick(30)
